@@ -5,9 +5,9 @@ import React, { useState } from "react";
 const Home: React.FC = () => {
   const [prompt, setPrompt] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('');
-  // const [generatedImages, setGeneratedImages] = useState<ImageProps[]>(
-  //   []
-  // );
+  const [generatedImages, setGeneratedImages] = useState<ImageProps[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const handleGenerateImage = async () => {
@@ -21,7 +21,6 @@ const Home: React.FC = () => {
         'Content-type': 'application/json',
       }
     })
-
     if (!resp.ok) {
       setIsLoading(false);
       return;
@@ -29,8 +28,8 @@ const Home: React.FC = () => {
 
     const data = await resp.json()
     setIsLoading(false);
-    // setImageUrl(data?.message);
-    // setGeneratedImages((prev) => [...prev, { imageUrl: data?.message, prompt}])
+    setImageUrl(data?.message);
+    setGeneratedImages((prev) => [...prev, { imageUrl: data?.message, prompt}])
 
     // console.log("Generating Images")
     // console.log(process.env.NEXT_PUBLIC_GPT_API_KEY)
@@ -65,6 +64,29 @@ const Home: React.FC = () => {
 
         {imageUrl && <ImageCard action={() => setImageUrl(imageUrl)} imageUrl={imageUrl} prompt={prompt}/>}
       </div>
+      {
+        generatedImages.length ? (
+          <div className="">
+            <h3 className="text-xl text-center mb-4">
+              Generated Images 
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 border max-w-full md:max-w-[1100px] p-2 overflow-y-scroll h-96">
+              {generatedImages?.map(
+                ({imageUrl, prompt}: ImageProps, index) => (
+                  <ImageCard 
+                    action={() => setImageUrl(imageUrl)}
+                    imageUrl={imageUrl}
+                    prompt={prompt}
+                    key={index}
+                    width="w-full"
+                    height='h-40'
+                  />
+                )
+              )}
+            </div>
+          </div>
+        ) : ""
+      }
     </div>
   );
 };
